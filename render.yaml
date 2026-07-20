@@ -1,0 +1,67 @@
+# ============================================================
+# RENDER DEPLOYMENT CONFIGURATION
+# ============================================================
+# ⚠️ IMPORTANT: Before deploying, you MUST set these secrets:
+#   - JWT_SECRET: Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+#   - ENCRYPTION_KEY: Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+#   - TICKERALL_API_KEY: Your TickerAll API key
+#   - OWNER_EMAIL: Admin email
+#   - OWNER_PASSWORD: Admin password (remove after first login)
+# ============================================================
+
+services:
+  - type: web
+    name: alpha-ai-exness-bot
+    runtime: node
+    region: oregon
+    plan: starter
+
+    buildCommand: npm install
+    startCommand: node server.js
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      # CRITICAL: These must be set manually in Render dashboard
+      # DO NOT use generateValue: true - they must be persistent
+      - key: JWT_SECRET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: TICKERALL_API_KEY
+        sync: false
+      - key: OWNER_EMAIL
+        sync: false
+      - key: OWNER_PASSWORD
+        sync: false
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: MAX_CONCURRENT_TRADES
+        value: "100"
+      - key: MIN_BALANCE_FOR_TRADE
+        value: "10"
+      - key: MAX_MARGIN_RISK
+        value: "50"
+      - key: ALLOW_FORCED_TRADES
+        value: "true"
+      - key: DEFAULT_RISK_PERCENT
+        value: "8"
+      - key: MIN_RISK_PERCENT
+        value: "1"
+      - key: MAX_RISK_PERCENT
+        value: "25"
+
+    disk:
+      name: alpha-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 2
+
+    healthCheckPath: /api/health
+    autoDeploy: true
+    numInstances: 1
