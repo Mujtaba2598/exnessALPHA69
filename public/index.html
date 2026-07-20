@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ALPHA - AI Trading Bot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        /* ============================================================
+           CSS - COMPLETE BENTO GRID DASHBOARD
+           ============================================================ */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0e17;
+            color: #e8edf5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #141c2b; }
+        ::-webkit-scrollbar-thumb { background: #2a3a5c; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4fc3f7; }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 16px 20px;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0e17;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(20px);
+        }
+
+        .login-box {
+            background: rgba(20, 28, 43, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 48px 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-box .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-box .logo h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4fc3f7, #81d4fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-box .logo p {
+            color: #78909c;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .login-box .form-group label {
+            display: block;
+            color: #b0bec5;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .login-box .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #1a2538;
+            border: 1px solid #2a3a5c;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .login-box .form-group input:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.15);
+        }
+
+        .login-box .form-group input::placeholder {
+            color: #546e7a;
+        }
+
+        .login-box .form-group .toggle-password {
+            position: absolute;
+            right: 14px;
+            bottom: 12px;
+            background: none;
+            border: none;
+            color: #546e7a;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+        }
+
+        .login-box .form-group .toggle-password:hover {
+            color: #b0bec5;
+        }
+
+        .login-box .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+            border: none;
+            border-radius: 12px;
+            color: #0a0e17;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+
+        .login-box .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3);
+        }
+
+        .login-box .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .login-box .register-link {
+            text-align: center;
+            margin-top: 16px;
+            color: #78909c;
+            font-size: 0.9rem;
+        }
+
+        .login-box .register-link a {
+            color: #4fc3f7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-box .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .login-error {
+            background: rgba(239, 83, 80, 0.15);
+            color: #ef5350;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            border: 1px solid rgba(239, 83, 80, 0.2);
+            display: none;
+        }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 20px 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .dashboard-header .left h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4fc3f7, #81d4fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-header .left .subtitle {
+            color: #78909c;
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        .dashboard-header .right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: #1a2538;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #b0bec5;
+            border: 1px solid #2a3a5c;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.online { background: #66bb6a; }
+        .status-dot.offline { background: #ef5350; }
+        .status-dot.warning { background: #ffa726; }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+            color: #0a0e17;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3); }
+
+        .btn-success {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: #fff;
+        }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 187, 106, 0.3); }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef5350, #d32f2f);
+            color: #fff;
+        }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239, 83, 80, 0.3); }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa726, #f57c00);
+            color: #0a0e17;
+        }
+        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 167, 38, 0.3); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #2a3a5c;
+            color: #b0bec5;
+        }
+        .btn-outline:hover { border-color: #4fc3f7; color: #fff; background: rgba(79, 195, 247, 0.05); }
+
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+        .btn-xs { padding: 4px 10px; font-size: 0.7rem; }
+
+        /* ===== BENTO GRID ===== */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .bento-item {
+            background: rgba(20, 28, 43, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px 22px;
+            border: 1px solid rgba(42, 58, 92, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-item:hover {
+            border-color: rgba(79, 195, 247, 0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .bento-item .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .bento-item .header .icon {
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .bento-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #78909c;
+            font-weight: 600;
+        }
+
+        .bento-item .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .bento-item .value.green { color: #66bb6a; }
+        .bento-item .value.red { color: #ef5350; }
+        .bento-item .value.gold { color: #ffa726; }
+        .bento-item .value.blue { color: #4fc3f7; }
+
+        .bento-item .sub {
+            font-size: 0.8rem;
+            color: #78909c;
+            margin-top: 4px;
+        }
+
+        .col-span-2 { grid-column: span 2; }
+        .col-span-3 { grid-column: span 3; }
+        .col-span-4 { grid-column: span 4; }
+        .row-span-2 { grid-row: span 2; }
+
+        /* ===== MODALS ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: #141c2b;
+            border-radius: 20px;
+            padding: 32px 36px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .modal .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal .modal-title .icon { color: #4fc3f7; }
+
+        .modal .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .modal .form-group label {
+            display: block;
+            color: #b0bec5;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .modal .form-group input,
+        .modal .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1a2538;
+            border: 1px solid #2a3a5c;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .modal .form-group input:focus,
+        .modal .form-group select:focus {
+            outline: none;
+            border-color: #4fc3f7;
+        }
+
+        .modal .form-group input::placeholder { color: #546e7a; }
+        .modal .form-group select option { background: #1a2538; }
+
+        .modal .form-group .toggle-password {
+            position: absolute;
+            right: 12px;
+            bottom: 10px;
+            background: none;
+            border: none;
+            color: #546e7a;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+        }
+
+        .modal .form-group .toggle-password:hover {
+            color: #b0bec5;
+        }
+
+        .modal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .modal .modal-actions .btn { flex: 1; justify-content: center; }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #2a3a5c;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #4fc3f7;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+        .range-value {
+            color: #4fc3f7;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* ===== ADMIN PANEL ===== */
+        .admin-panel {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .admin-panel .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .admin-panel .admin-card {
+            background: rgba(20, 28, 43, 0.85);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(42, 58, 92, 0.4);
+        }
+
+        .admin-panel .admin-card .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #b0bec5;
+            margin-bottom: 12px;
+        }
+
+        .admin-panel .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .admin-panel .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(42, 58, 92, 0.2);
+        }
+
+        .admin-panel .user-item .user-info { display: flex; flex-direction: column; }
+        .admin-panel .user-item .user-info .email { font-size: 0.9rem; font-weight: 500; }
+        .admin-panel .user-item .user-info .meta { font-size: 0.75rem; color: #78909c; }
+        .admin-panel .user-item .user-actions { display: flex; gap: 6px; }
+
+        /* ===== DIAGNOSTIC PANEL ===== */
+        .health-score {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(20, 28, 43, 0.85);
+            border-radius: 16px;
+            border: 1px solid rgba(42, 58, 92, 0.4);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .health-score .score-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .health-score .score-circle.good { background: rgba(102, 187, 106, 0.2); color: #66bb6a; border: 2px solid #66bb6a; }
+        .health-score .score-circle.warning { background: rgba(255, 167, 38, 0.2); color: #ffa726; border: 2px solid #ffa726; }
+        .health-score .score-circle.critical { background: rgba(239, 83, 80, 0.2); color: #ef5350; border: 2px solid #ef5350; }
+
+        .health-score .score-info .status-label { font-size: 1.1rem; font-weight: 600; }
+        .health-score .score-info .status-detail { color: #78909c; font-size: 0.85rem; }
+
+        .diagnostic-issues {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .diagnostic-issue {
+            background: rgba(20, 28, 43, 0.85);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(42, 58, 92, 0.4);
+        }
+
+        .diagnostic-issue .issue-title { font-weight: 600; font-size: 0.9rem; }
+        .diagnostic-issue .issue-desc { font-size: 0.8rem; color: #78909c; margin-top: 2px; }
+        .diagnostic-issue .issue-action { margin-top: 8px; }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: #1a2538;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tabs .tab {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            color: #78909c;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .tabs .tab.active {
+            background: #2a3a5c;
+            color: #fff;
+        }
+
+        .tabs .tab:hover:not(.active) { color: #fff; }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        table th {
+            text-align: left;
+            padding: 8px 12px;
+            color: #78909c;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(42, 58, 92, 0.3);
+        }
+
+        table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(42, 58, 92, 0.15);
+        }
+
+        table tr:hover td { background: rgba(42, 58, 92, 0.1); }
+
+        /* ===== UTILITY ===== */
+        .hidden { display: none !important; }
+        .flex { display: flex; align-items: center; gap: 8px; }
+        .flex-wrap { flex-wrap: wrap; }
+        .gap-2 { gap: 8px; }
+        .gap-4 { gap: 16px; }
+        .mt-8 { margin-top: 8px; }
+        .mt-16 { margin-top: 16px; }
+        .mb-8 { margin-bottom: 8px; }
+        .mb-16 { margin-bottom: 16px; }
+        .text-center { text-align: center; }
+        .text-muted { color: #78909c; }
+        .text-sm { font-size: 0.85rem; }
+        .text-xs { font-size: 0.75rem; }
+        .w-full { width: 100%; }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(79, 195, 247, 0.1);
+            border-radius: 50%;
+            border-top-color: #4fc3f7;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .bento-grid { grid-template-columns: repeat(3, 1fr); }
+            .col-span-2 { grid-column: span 2; }
+            .col-span-3 { grid-column: span 3; }
+            .col-span-4 { grid-column: span 3; }
+            .admin-panel .admin-grid { grid-template-columns: 1fr; }
+            .diagnostic-issues { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .bento-grid { grid-template-columns: 1fr 1fr; }
+            .col-span-2 { grid-column: span 2; }
+            .col-span-3 { grid-column: span 2; }
+            .col-span-4 { grid-column: span 2; }
+            .row-span-2 { grid-row: span 1; }
+            .modal { padding: 24px 20px; }
+            .modal .form-row { grid-template-columns: 1fr; }
+            .dashboard-header .left h1 { font-size: 1.2rem; }
+            .login-box { padding: 32px 24px; }
+            .health-score { flex-direction: column; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .col-span-2 { grid-column: span 1; }
+            .col-span-3 { grid-column: span 1; }
+            .col-span-4 { grid-column: span 1; }
+            .container { padding: 10px 12px; }
+            .dashboard-header { flex-direction: column; align-items: stretch; }
+            .dashboard-header .right { justify-content: flex-start; }
+            .bento-item .value { font-size: 1.4rem; }
+            .bento-item { padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== LOGIN OVERLAY ===== -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+        <div class="logo">
+            <h1>ALPHA</h1>
+            <p>AI-Powered Trading Bot</p>
+        </div>
+        <div class="login-error" id="loginError"></div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="Enter your email" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password" />
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword')">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        <button class="btn-login" id="loginBtn" onclick="handleLogin()">Login</button>
+        <div class="register-link">
+            New user? <a href="#" onclick="showRegister()">Request access</a>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="dashboard" id="dashboard">
+
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="left">
+                <h1>ALPHA Dashboard</h1>
+                <div class="subtitle">Welcome back, <span id="userEmailDisplay">User</span></div>
+            </div>
+            <div class="right">
+                <div class="status-badge">
+                    <span class="status-dot offline" id="statusDot"></span>
+                    <span id="statusText">Disconnected</span>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="toggleAdmin()">
+                    <i class="fas fa-cog"></i> Admin
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BENTO GRID -->
+    <div class="container">
+        <div class="bento-grid" id="bentoGrid">
+            <!-- 1. Balance -->
+            <div class="bento-item">
+                <div class="header">
+                    <span class="label">Balance</span>
+                    <span class="icon">💰</span>
+                </div>
+                <div class="value blue" id="balanceValue">$0.00</div>
+                <div class="sub" id="balanceSub">Last updated: --</div>
+            </div>
+
+            <!-- 2. Profit -->
+            <div class="bento-item">
+                <div class="header">
+                    <span class="label">Profit / Loss</span>
+                    <span class="icon">📈</span>
+                </div>
+                <div class="value" id="profitValue">$0.00</div>
+                <div class="sub" id="profitSub">0%</div>
+            </div>
+
+            <!-- 3. Open Positions -->
+            <div class="bento-item">
+                <div class="header">
+                    <span class="label">Open Positions</span>
+                    <span class="icon">📊</span>
+                </div>
+                <div class="value gold" id="positionsValue">0</div>
+                <div class="sub" id="positionsSub">Max: Unlimited</div>
+            </div>
+
+            <!-- 4. Win Rate -->
+            <div class="bento-item">
+                <div class="header">
+                    <span class="label">Win Rate</span>
+                    <span class="icon">🏆</span>
+                </div>
+                <div class="value green" id="winRateValue">0%</div>
+                <div class="sub" id="winRateSub">0 wins / 0 trades</div>
+            </div>
+
+            <!-- 5. Performance Chart -->
+            <div class="bento-item col-span-2">
+                <div class="header">
+                    <span class="label">Performance</span>
+                    <span class="icon">📉</span>
+                </div>
+                <div style="height:120px;">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 6. Quick Actions -->
+            <div class="bento-item">
+                <div class="header">
+                    <span class="label">Quick Actions</span>
+                    <span class="icon">⚡</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    <button class="btn btn-success btn-sm" onclick="openExnessModal()">
+                        <i class="fas fa-plug"></i> Connect Exness
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="startTrading()">
+                        <i class="fas fa-play"></i> Start Trading
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="stopTrading()">
+                        <i class="fas fa-stop"></i> Stop Trading
+                    </button>
+                    <button class="btn btn-warning btn-sm" onclick="openRiskModal()">
+                        <i class="fas fa-shield-alt"></i> Risk Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- 7. Trading Status -->
+            <div class="bento-item">
+                <div class="header">
+                    <span class="label">Trading Status</span>
+                    <span class="icon">🤖</span>
+                </div>
+                <div class="value" id="tradingStatus" style="font-size:1.2rem;">Idle</div>
+                <div class="sub" id="tradingSub">Risk: 8% | Speed: 1s</div>
+                <div style="margin-top:8px;font-size:0.8rem;color:#78909c;" id="sessionInfo">No active session</div>
+            </div>
+
+            <!-- 8. Recent Trades -->
+            <div class="bento-item col-span-2">
+                <div class="header">
+                    <span class="label">Recent Trades</span>
+                    <span class="icon">📋</span>
+                </div>
+                <div id="tradeList" style="max-height:140px;overflow-y:auto;">
+                    <div class="text-muted text-sm" style="padding:12px 0;text-align:center;">No trades yet</div>
+                </div>
+            </div>
+
+            <!-- 9. AI Learning Stats -->
+            <div class="bento-item col-span-2">
+                <div class="header">
+                    <span class="label">🧠 AI Learning</span>
+                    <span class="icon">💡</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px;">
+                    <div><span class="text-muted text-xs">Total Trades</span><br><span class="value" style="font-size:1.2rem;" id="aiTotalTrades">0</span></div>
+                    <div><span class="text-muted text-xs">Patterns</span><br><span class="value" style="font-size:1.2rem;" id="aiPatterns">0</span></div>
+                    <div><span class="text-muted text-xs">Symbols</span><br><span class="value" style="font-size:1.2rem;" id="aiSymbols">0</span></div>
+                    <div><span class="text-muted text-xs">Adaptive Rules</span><br><span class="value" style="font-size:1.2rem;" id="aiRules">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="container">
+        <div class="admin-panel" id="adminPanel">
+            <div class="tabs">
+                <button class="tab active" onclick="switchAdminTab('users')">Users</button>
+                <button class="tab" onclick="switchAdminTab('api')">API Keys</button>
+                <button class="tab" onclick="switchAdminTab('diagnostic')">Diagnostics</button>
+            </div>
+
+            <div id="adminUsersTab">
+                <div class="admin-grid">
+                    <div class="admin-card">
+                        <div class="card-title">👥 Users</div>
+                        <div class="user-list" id="userList"><div class="text-muted text-sm">Loading users...</div></div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-title">📊 User Balances</div>
+                        <div class="user-list" id="balanceList"><div class="text-muted text-sm">Loading balances...</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adminApiTab" style="display:none;">
+                <div class="admin-grid">
+                    <div class="admin-card">
+                        <div class="card-title">🔑 TickerAll API Key</div>
+                        <div class="form-group">
+                            <label>Current API Key</label>
+                            <input type="text" id="apiKeyDisplay" readonly style="width:100%;padding:10px;background:#1a2538;border:1px solid #2a3a5c;border-radius:10px;color:#78909c;font-family:monospace;" />
+                        </div>
+                        <div class="form-group">
+                            <label>New API Key</label>
+                            <input type="text" id="apiKeyInput" placeholder="Enter new API key" style="width:100%;padding:10px;background:#1a2538;border:1px solid #2a3a5c;border-radius:10px;color:#fff;" />
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-primary btn-sm" onclick="updateApiKey()">Update Key</button>
+                            <button class="btn btn-outline btn-sm" onclick="testApiKey()">Test Key</button>
+                        </div>
+                        <div id="apiKeyStatus" class="mt-8 text-sm text-muted"></div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-title">🔐 Change Owner Password</div>
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="Enter current password" style="width:100%;padding:10px;background:#1a2538;border:1px solid #2a3a5c;border-radius:10px;color:#fff;" />
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('currentPassword')" style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:#546e7a;cursor:pointer;font-size:1rem;padding:4px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-group" style="position:relative;">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter new password (min 8 chars)" style="width:100%;padding:10px;background:#1a2538;border:1px solid #2a3a5c;border-radius:10px;color:#fff;" />
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('newPassword')" style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:#546e7a;cursor:pointer;font-size:1rem;padding:4px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-warning btn-sm" onclick="changePassword()">Change Password</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adminDiagnosticTab" style="display:none;">
+                <div class="health-score" id="healthScoreDisplay">
+                    <div class="score-circle warning" id="healthCircle">100</div>
+                    <div class="score-info">
+                        <div class="status-label" id="healthStatus">Healthy</div>
+                        <div class="status-detail" id="healthDetail">All systems operational</div>
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button class="btn btn-primary btn-sm" onclick="runDiagnosticScan()">🔄 Scan Now</button>
+                        <button class="btn btn-success btn-sm" onclick="runAutoFix()">🔧 Auto Fix</button>
+                    </div>
+                </div>
+                <div class="diagnostic-issues" id="diagnosticIssues">
+                    <div class="text-muted text-sm">Run a diagnostic scan to see issues.</div>
+                </div>
+                <div class="mt-16">
+                    <div class="card-title">📋 Heal Logs</div>
+                    <div class="table-wrap">
+                        <table id="healLogTable">
+                            <thead><tr><th>Time</th><th>Action</th><th>Status</th><th>Message</th></tr></thead>
+                            <tbody id="healLogBody"><tr><td colspan="4" class="text-muted text-sm">No logs</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Exness Modal -->
+<div class="modal-overlay" id="exnessModal">
+    <div class="modal">
+        <div class="modal-title"><span class="icon">🔌</span> Connect Exness Account</div>
+        <div class="form-group">
+            <label>Exness Login</label>
+            <input type="text" id="exnessLogin" placeholder="Enter your Exness login" />
+        </div>
+        <div class="form-group">
+            <label>Exness Password</label>
+            <input type="password" id="exnessPassword" placeholder="Enter your Exness password" />
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('exnessPassword')">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        <div class="form-group">
+            <label>Exness Server</label>
+            <select id="exnessServer">
+                <option value="Exness-Real">Exness-Real</option>
+                <option value="Exness-Real2">Exness-Real2</option>
+                <option value="Exness-Real3">Exness-Real3</option>
+                <option value="Exness-Real4">Exness-Real4</option>
+                <option value="Exness-Real5">Exness-Real5</option>
+                <option value="Exness-Real6">Exness-Real6</option>
+                <option value="Exness-Real7">Exness-Real7</option>
+                <option value="Exness-Real8">Exness-Real8</option>
+                <option value="Exness-Real9">Exness-Real9</option>
+                <option value="Exness-Real10">Exness-Real10</option>
+                <option value="Exness-Real11">Exness-Real11</option>
+                <option value="Exness-Real12">Exness-Real12</option>
+                <option value="Exness-Real13">Exness-Real13</option>
+                <option value="Exness-Real14">Exness-Real14</option>
+                <option value="Exness-Real15">Exness-Real15</option>
+                <option value="Exness-Real16">Exness-Real16</option>
+                <option value="Exness-Real17">Exness-Real17</option>
+                <option value="Exness-Real18">Exness-Real18</option>
+                <option value="Exness-Real19">Exness-Real19</option>
+                <option value="Exness-Real20">Exness-Real20</option>
+            </select>
+        </div>
+        <div id="exnessStatus" class="text-sm text-muted"></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('exnessModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="connectExness()">Connect</button>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Modal -->
+<div class="modal-overlay" id="riskModal">
+    <div class="modal">
+        <div class="modal-title"><span class="icon">🛡️</span> Risk Management</div>
+        <div class="form-group">
+            <label>Risk Per Trade: <span class="range-value" id="riskPercentDisplay">8%</span></label>
+            <input type="range" id="riskPercent" min="1" max="25" value="8" step="0.5" oninput="document.getElementById('riskPercentDisplay').textContent = this.value + '%'" />
+            <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#546e7a;">
+                <span>1%</span><span>25%</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Max Concurrent Trades</label>
+                <input type="number" id="maxConcurrentTrades" value="10" min="1" max="100" />
+            </div>
+            <div class="form-group">
+                <label>Min Balance ($)</label>
+                <input type="number" id="minBalance" value="10" min="1" max="1000" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Stop Loss Multiplier</label>
+                <input type="number" id="stopLossMultiplier" value="1.5" min="0.5" max="5" step="0.1" />
+            </div>
+            <div class="form-group">
+                <label>Take Profit Multiplier</label>
+                <input type="number" id="takeProfitMultiplier" value="2.0" min="0.5" max="10" step="0.1" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Max Daily Loss (%)</label>
+                <input type="number" id="maxDailyLoss" value="20" min="1" max="100" />
+            </div>
+            <div class="form-group">
+                <label>Max Daily Trades</label>
+                <input type="number" id="maxDailyTrades" value="100" min="1" max="1000" />
+            </div>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+            <label style="margin:0;">Auto-Compound</label>
+            <input type="checkbox" id="autoCompound" checked style="width:auto;accent-color:#4fc3f7;" />
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+            <label style="margin:0;">Allow Forced Trades</label>
+            <input type="checkbox" id="allowForcedTrades" checked style="width:auto;accent-color:#4fc3f7;" />
+            <span class="text-xs text-muted" style="margin-left:4px;">(Trade even when confidence is low)</span>
+        </div>
+        <div id="riskStatus" class="text-sm text-muted"></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('riskModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveRiskSettings()">Save Settings</button>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal-overlay" id="registerModal">
+    <div class="modal">
+        <div class="modal-title"><span class="icon">📝</span> Request Access</div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="registerEmail" placeholder="Enter your email" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="registerPassword" placeholder="Create a password" />
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('registerPassword')">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        <div id="registerStatus" class="text-sm text-muted"></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('registerModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="handleRegister()">Request Access</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// COMPLETE JAVASCRIPT - NO PRE-FILLED CREDENTIALS
+// ============================================================
+
+let token = null;
+let isOwner = false;
+let currentUser = null;
+let currentSessionId = null;
+let updateInterval = null;
+let performanceChart = null;
+let chartData = [];
+
+const API_BASE = '';
+
+// ============================================================
+// PASSWORD VISIBILITY TOGGLE
+// ============================================================
+
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    const container = input.closest('.form-group');
+    if (!container) return;
+    
+    const button = container.querySelector('.toggle-password');
+    if (!button) return;
+    
+    const icon = button.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        if (icon) icon.className = 'fas fa-eye';
+    }
+}
+
+// ============================================================
+// LOGIN / LOGOUT
+// ============================================================
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+
+    if (!email || !password) {
+        errorEl.textContent = 'Please enter both email and password.';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    errorEl.style.display = 'none';
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="spinner"></span> Logging in...';
+
+    try {
+        const res = await fetch(API_BASE + '/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            token = data.token;
+            isOwner = data.isOwner || false;
+            currentUser = data.user;
+
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('userEmailDisplay').textContent = email;
+
+            if (isOwner) {
+                document.querySelector('.admin-panel').style.display = 'block';
+            }
+
+            await loadUserSettings();
+            await loadDashboardData();
+            initPerformanceChart();
+            startRealtimeUpdates();
+
+            if (isOwner) {
+                loadAdminUsers();
+                loadApiKeyStatus();
+            }
+        } else {
+            errorEl.textContent = data.message || 'Login failed.';
+            errorEl.style.display = 'block';
+        }
+    } catch (e) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'block';
+        console.error('Login error:', e);
+    } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'Login';
+    }
+}
+
+function handleLogout() {
+    token = null;
+    currentUser = null;
+    if (updateInterval) clearInterval(updateInterval);
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('statusDot').className = 'status-dot offline';
+    document.getElementById('statusText').textContent = 'Disconnected';
+}
+
+function showRegister() {
+    document.getElementById('registerModal').classList.add('active');
+}
+
+async function handleRegister() {
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const statusEl = document.getElementById('registerStatus');
+
+    if (!email || !password) {
+        statusEl.textContent = 'Please fill in all fields.';
+        statusEl.style.color = '#ef5350';
+        return;
+    }
+
+    if (password.length < 6) {
+        statusEl.textContent = 'Password must be at least 6 characters.';
+        statusEl.style.color = '#ef5350';
+        return;
+    }
+
+    try {
+        const res = await fetch(API_BASE + '/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            statusEl.textContent = '✅ Registration request sent! Wait for owner approval.';
+            statusEl.style.color = '#66bb6a';
+            setTimeout(() => {
+                closeModal('registerModal');
+                document.getElementById('loginEmail').value = email;
+            }, 2000);
+        } else {
+            statusEl.textContent = data.message || 'Registration failed.';
+            statusEl.style.color = '#ef5350';
+        }
+    } catch (e) {
+        statusEl.textContent = 'Network error.';
+        statusEl.style.color = '#ef5350';
+    }
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function openExnessModal() {
+    openModal('exnessModal');
+    loadExnessCreds();
+}
+
+function openRiskModal() {
+    openModal('riskModal');
+    loadRiskSettings();
+}
+
+// ============================================================
+// EXNESS CONNECTION
+// ============================================================
+
+async function loadExnessCreds() {
+    if (!token) return;
+    try {
+        const res = await fetch(API_BASE + '/api/get-exness-creds', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('exnessLogin').value = data.exnessLogin || '';
+            document.getElementById('exnessServer').value = data.exnessServer || 'Exness-Real';
+        }
+    } catch (e) { console.error('Load creds error:', e); }
+}
+
+async function connectExness() {
+    const login = document.getElementById('exnessLogin').value.trim();
+    const password = document.getElementById('exnessPassword').value;
+    const server = document.getElementById('exnessServer').value;
+    const statusEl = document.getElementById('exnessStatus');
+
+    if (!login || !password) {
+        statusEl.textContent = 'Please enter login and password.';
+        statusEl.style.color = '#ef5350';
+        return;
+    }
+
+    statusEl.textContent = 'Connecting...';
+    statusEl.style.color = '#ffa726';
+
+    try {
+        const res = await fetch(API_BASE + '/api/set-exness-creds', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ exnessLogin: login, exnessPassword: password, exnessServer: server })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            statusEl.textContent = '✅ ' + data.message;
+            statusEl.style.color = '#66bb6a';
+            setTimeout(() => closeModal('exnessModal'), 1500);
+            await loadDashboardData();
+        } else {
+            statusEl.textContent = '❌ ' + data.message;
+            statusEl.style.color = '#ef5350';
+        }
+    } catch (e) {
+        statusEl.textContent = '❌ Network error.';
+        statusEl.style.color = '#ef5350';
+        console.error('Connect error:', e);
+    }
+}
+
+// ============================================================
+// RISK SETTINGS
+// ============================================================
+
+async function loadRiskSettings() {
+    if (!token) return;
+    try {
+        const res = await fetch(API_BASE + '/api/user/risk-settings', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.riskSettings) {
+            const s = data.riskSettings;
+            document.getElementById('riskPercent').value = s.riskPercent || 8;
+            document.getElementById('riskPercentDisplay').textContent = (s.riskPercent || 8) + '%';
+            document.getElementById('maxConcurrentTrades').value = s.maxConcurrentTrades || 10;
+            document.getElementById('minBalance').value = s.minBalance || 10;
+            document.getElementById('stopLossMultiplier').value = s.stopLossMultiplier || 1.5;
+            document.getElementById('takeProfitMultiplier').value = s.takeProfitMultiplier || 2.0;
+            document.getElementById('maxDailyLoss').value = s.maxDailyLoss || 20;
+            document.getElementById('maxDailyTrades').value = s.maxDailyTrades || 100;
+            document.getElementById('autoCompound').checked = s.autoCompound !== false;
+            document.getElementById('allowForcedTrades').checked = s.allowForcedTrades !== false;
+        }
+    } catch (e) { console.error('Load risk error:', e); }
+}
+
+async function saveRiskSettings() {
+    const statusEl = document.getElementById('riskStatus');
+    const settings = {
+        riskPercent: parseFloat(document.getElementById('riskPercent').value),
+        maxConcurrentTrades: parseInt(document.getElementById('maxConcurrentTrades').value),
+        minBalance: parseFloat(document.getElementById('minBalance').value),
+        stopLossMultiplier: parseFloat(document.getElementById('stopLossMultiplier').value),
+        takeProfitMultiplier: parseFloat(document.getElementById('takeProfitMultiplier').value),
+        maxDailyLoss: parseFloat(document.getElementById('maxDailyLoss').value),
+        maxDailyTrades: parseInt(document.getElementById('maxDailyTrades').value),
+        autoCompound: document.getElementById('autoCompound').checked,
+        allowForcedTrades: document.getElementById('allowForcedTrades').checked
+    };
+
+    try {
+        const res = await fetch(API_BASE + '/api/user/risk-settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(settings)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            statusEl.textContent = '✅ Settings saved!';
+            statusEl.style.color = '#66bb6a';
+            setTimeout(() => closeModal('riskModal'), 1000);
+        } else {
+            statusEl.textContent = '❌ ' + data.message;
+            statusEl.style.color = '#ef5350';
+        }
+    } catch (e) {
+        statusEl.textContent = '❌ Network error.';
+        statusEl.style.color = '#ef5350';
+        console.error('Save risk error:', e);
+    }
+}
+
+async function loadUserSettings() {
+    if (!token) return;
+    try {
+        const res = await fetch(API_BASE + '/api/user/risk-settings', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.riskSettings) {
+            document.getElementById('tradingSub').textContent =
+                `Risk: ${data.riskSettings.riskPercent}% | Speed: 1s | ${data.riskSettings.autoCompound ? 'Compound ON' : 'Compound OFF'} | Forced: ${data.riskSettings.allowForcedTrades !== false ? 'ON' : 'OFF'}`;
+        }
+    } catch (e) { console.error('Load user settings error:', e); }
+}
+
+// ============================================================
+// DASHBOARD DATA
+// ============================================================
+
+async function loadDashboardData() {
+    if (!token) return;
+
+    try {
+        const res = await fetch(API_BASE + '/api/trading-update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ sessionId: currentSessionId || '' })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById('profitValue').textContent = `$${(data.currentProfit || 0).toFixed(2)}`;
+            document.getElementById('profitValue').className = 'value ' + ((data.currentProfit || 0) >= 0 ? 'green' : 'red');
+            document.getElementById('profitSub').textContent = `${((data.currentProfit || 0) / (data.totalInvestment || 1) * 100).toFixed(1)}%`;
+
+            document.getElementById('positionsValue').textContent = data.openPositions || 0;
+            document.getElementById('positionsSub').textContent =
+                `Max: ${data.maxConcurrentTrades || 'Unlimited'} | Margin: $${(data.usedMargin || 0).toFixed(2)}`;
+
+            document.getElementById('winRateValue').textContent = `${(data.winStreak || 0) > 0 ? '🔥 ' : ''}${(data.winStreak || 0)}`;
+            document.getElementById('winRateSub').textContent =
+                `${data.tradeCount || 0} trades | ${data.compounding || 'DISABLED'}`;
+
+            document.getElementById('balanceValue').textContent =
+                `$${(data.currentBalance || 0).toFixed(2)}`;
+
+            if (data.isActive) {
+                document.getElementById('tradingStatus').textContent = '🟢 Active';
+                document.getElementById('tradingStatus').style.color = '#66bb6a';
+                document.getElementById('sessionInfo').textContent =
+                    `Session: ${currentSessionId || 'N/A'} | ${data.openPositions || 0} open positions | Forced: ${data.forcedTradesExecuted || 0}`;
+                if (currentSessionId) {
+                    document.getElementById('tradingSub').textContent =
+                        `Risk: ${data.risk || '8%'} | Profit: $${(data.currentProfit || 0).toFixed(2)} / $${(data.targetProfit || 0).toFixed(2)} | Forced: ${data.allowForcedTrades ? 'ON' : 'OFF'}`;
+                }
+            } else {
+                document.getElementById('tradingStatus').textContent = '⏸️ Idle';
+                document.getElementById('tradingStatus').style.color = '#78909c';
+            }
+
+            const tradeList = document.getElementById('tradeList');
+            if (data.newTrades && data.newTrades.length > 0) {
+                tradeList.innerHTML = data.newTrades.slice(0, 20).map(t =>
+                    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(42,58,92,0.15);font-size:0.85rem;">
+                        <span>${t.symbol || 'N/A'} ${t.side || ''}</span>
+                        <span>${t.profit ? (t.profit > 0 ? '+' : '') + t.profit : t.entryPrice || ''}</span>
+                        <span style="color:#78909c;font-size:0.75rem;">${t.timestamp ? new Date(t.timestamp).toLocaleTimeString() : ''}</span>
+                        ${t.isForced ? '<span style="color:#ffa726;font-size:0.7rem;">⚠️ FORCED</span>' : ''}
+                    </div>`
+                ).join('');
+            } else {
+                tradeList.innerHTML = '<div class="text-muted text-sm" style="padding:12px 0;text-align:center;">No recent trades</div>';
+            }
+
+            document.getElementById('aiTotalTrades').textContent = data.tradeCount || 0;
+            document.getElementById('aiPatterns').textContent = data.patterns || 0;
+            document.getElementById('aiSymbols').textContent = data.symbols || 0;
+            document.getElementById('aiRules').textContent = data.adaptiveRules || 0;
+        }
+    } catch (e) {
+        console.error('Load dashboard error:', e);
+    }
+
+    try {
+        const balRes = await fetch(API_BASE + '/api/connect-exness', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const balData = await balRes.json();
+        if (balData.success) {
+            document.getElementById('balanceValue').textContent = `$${(balData.balance || 0).toFixed(2)}`;
+            document.getElementById('balanceSub').textContent =
+                `Updated: ${new Date().toLocaleTimeString()} | ${balData.currency || 'USD'}`;
+        }
+    } catch (e) { console.error('Balance fetch error:', e); }
+}
+
+// ============================================================
+// PERFORMANCE CHART
+// ============================================================
+
+function initPerformanceChart() {
+    const canvas = document.getElementById('performanceChart');
+    if (!canvas) return;
+
+    try {
+        const ctx = canvas.getContext('2d');
+
+        for (let i = 0; i < 30; i++) {
+            chartData.push(100 + Math.random() * 20 - 10);
+        }
+
+        performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: 30 }, (_, i) => (i * 2) + 'm'),
+                datasets: [{
+                    label: 'Balance',
+                    data: chartData,
+                    borderColor: '#4fc3f7',
+                    backgroundColor: 'rgba(79,195,247,0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.03)' },
+                        ticks: { color: '#546e7a', font: { size: 8 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.03)' },
+                        ticks: { color: '#546e7a', font: { size: 8 } }
+                    }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            }
+        });
+    } catch (e) {
+        console.error('Chart init error:', e);
+    }
+}
+
+function updateChart(newValue) {
+    if (!performanceChart) return;
+    chartData.push(newValue);
+    if (chartData.length > 30) chartData.shift();
+    performanceChart.data.datasets[0].data = chartData;
+    performanceChart.update('none');
+}
+
+// ============================================================
+// TRADING CONTROLS
+// ============================================================
+
+async function startTrading() {
+    if (!token) {
+        alert('Please login first.');
+        return;
+    }
+
+    const investment = prompt('Enter investment amount ($10 minimum):', '100');
+    if (!investment) return;
+    const target = prompt('Enter target profit ($):', '50');
+    if (!target) return;
+    const timeLimit = prompt('Enter time limit (hours):', '1');
+    if (!timeLimit) return;
+
+    if (parseFloat(investment) < 10) {
+        alert('Minimum investment is $10.');
+        return;
+    }
+
+    try {
+        const res = await fetch(API_BASE + '/api/start-trading', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                investmentAmount: parseFloat(investment),
+                targetProfit: parseFloat(target),
+                timeLimit: parseFloat(timeLimit),
+                tradingPairs: ['XAUUSD', 'EURUSD', 'GBPUSD', 'BTCUSDT', 'ETHUSDT']
+            })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            currentSessionId = data.sessionId;
+            alert(`✅ ${data.message}\nSession: ${data.sessionId}\nRisk: ${data.risk}\nMax Trades: ${data.maxConcurrentTrades}\nForced Trades: ${data.allowForcedTrades ? 'ON' : 'OFF'}`);
+            await loadDashboardData();
+        } else {
+            alert('❌ Failed to start: ' + data.message);
+        }
+    } catch (e) {
+        alert('❌ Error starting trading.');
+        console.error('Start trading error:', e);
+    }
+}
+
+async function stopTrading() {
+    if (!token) {
+        alert('Please login first.');
+        return;
+    }
+
+    if (!currentSessionId) {
+        alert('No active session to stop.');
+        return;
+    }
+
+    if (!confirm('Stop trading session ' + currentSessionId + '?')) return;
+
+    try {
+        const res = await fetch(API_BASE + '/api/stop-trading', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ sessionId: currentSessionId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert('✅ Trading stopped.');
+            currentSessionId = null;
+            await loadDashboardData();
+        } else {
+            alert('❌ Failed to stop: ' + data.message);
+        }
+    } catch (e) {
+        alert('❌ Error stopping trading.');
+        console.error('Stop trading error:', e);
+    }
+}
+
+// ============================================================
+// REAL-TIME UPDATES
+// ============================================================
+
+function startRealtimeUpdates() {
+    if (updateInterval) clearInterval(updateInterval);
+    updateInterval = setInterval(async () => {
+        await loadDashboardData();
+        const base = parseFloat(document.getElementById('balanceValue').textContent.replace(/[$,]/g, '')) || 1000;
+        const change = (Math.random() - 0.5) * 20;
+        updateChart(base + change);
+
+        const dot = document.getElementById('statusDot');
+        const text = document.getElementById('statusText');
+        dot.className = 'status-dot online';
+        text.textContent = 'Connected';
+    }, 5000);
+
+    document.getElementById('statusDot').className = 'status-dot online';
+    document.getElementById('statusText').textContent = 'Connected';
+}
+
+// ============================================================
+// ADMIN - USERS
+// ============================================================
+
+async function loadAdminUsers() {
+    if (!token || !isOwner) return;
+
+    try {
+        const res = await fetch(API_BASE + '/api/admin/users', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            const userList = document.getElementById('userList');
+            if (data.users.length === 0) {
+                userList.innerHTML = '<div class="text-muted text-sm">No users found.</div>';
+            } else {
+                userList.innerHTML = data.users.map(u =>
+                    `<div class="user-item">
+                        <div class="user-info">
+                            <span class="email">${u.email} ${u.isOwner ? '👑' : ''}</span>
+                            <span class="meta">${u.isBlocked ? '🚫 Blocked' : '✅ Active'} | ${u.hasExnessCreds ? '🔌 Connected' : '❌ No Exness'} | Balance: $${u.balance || 0} | Forced: ${u.allowForcedTrades ? 'ON' : 'OFF'}</span>
+                        </div>
+                        <div class="user-actions">
+                            ${!u.isOwner ? `<button class="btn btn-xs ${u.isBlocked ? 'btn-success' : 'btn-danger'}" onclick="toggleBlock('${u.email}')">${u.isBlocked ? 'Unblock' : 'Block'}</button>` : ''}
+                        </div>
+                    </div>`
+                ).join('');
+            }
+            await loadAdminBalances();
+        }
+    } catch (e) { console.error('Load users error:', e); }
+}
+
+async function loadAdminBalances() {
+    try {
+        const res = await fetch(API_BASE + '/api/admin/user-balances', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            const balanceList = document.getElementById('balanceList');
+            const entries = Object.entries(data.balances);
+            if (entries.length === 0) {
+                balanceList.innerHTML = '<div class="text-muted text-sm">No balances.</div>';
+            } else {
+                balanceList.innerHTML = entries.map(([email, b]) =>
+                    `<div class="user-item">
+                        <div class="user-info">
+                            <span class="email">${email}</span>
+                            <span class="meta">${b.hasConnection ? '✅ Connected' : '❌ Offline'} | Risk: ${b.riskPercent || 8}% | Forced: ${b.allowForcedTrades !== false ? 'ON' : 'OFF'}</span>
+                        </div>
+                        <div style="font-weight:600;">$${(b.balance || 0).toFixed(2)} ${b.currency || 'USD'}</div>
+                    </div>`
+                ).join('');
+            }
+        }
+    } catch (e) { console.error('Load balances error:', e); }
+}
+
+async function toggleBlock(email) {
+    if (!confirm(`Toggle block for ${email}?`)) return;
+
+    try {
+        const res = await fetch(API_BASE + '/api/admin/toggle-block', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert(data.message);
+            loadAdminUsers();
+        } else {
+            alert('Failed: ' + data.message);
+        }
+    } catch (e) {
+        alert('Error toggling block.');
+        console.error(e);
+    }
+}
+
+// ============================================================
+// ADMIN - API KEYS
+// ============================================================
+
+async function loadApiKeyStatus() {
+    try {
+        const res = await fetch(API_BASE + '/api/admin/get-tickerall-key', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById('apiKeyDisplay').value = data.maskedKey || 'Not configured';
+            document.getElementById('apiKeyStatus').textContent =
+                `Status: ${data.status || 'unknown'} | Last updated: ${data.lastUpdated || 'Never'}`;
+        }
+    } catch (e) { console.error('Load API key error:', e); }
+}
+
+async function updateApiKey() {
+    const apiKey = document.getElementById('apiKeyInput').value.trim();
+    if (!apiKey) {
+        alert('Please enter an API key.');
+        return;
+    }
+
+    try {
+        const res = await fetch(API_BASE + '/api/admin/set-tickerall-key', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ apiKey })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert('✅ API key updated!');
+            document.getElementById('apiKeyInput').value = '';
+            loadApiKeyStatus();
+        } else {
+            alert('❌ Failed: ' + data.message);
+        }
+    } catch (e) {
+        alert('Error updating API key.');
+        console.error(e);
+    }
+}
+
+async function testApiKey() {
+    const apiKey = document.getElementById('apiKeyInput').value.trim();
+    if (!apiKey) {
+        alert('Please enter an API key to test.');
+        return;
+    }
+
+    try {
+        const res = await fetch(API_BASE + '/api/admin/test-tickerall-key', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ apiKey })
+        });
+        const data = await res.json();
+
+        if (data.valid) {
+            alert('✅ API key is valid!');
+        } else {
+            alert('❌ Invalid API key: ' + data.message);
+        }
+    } catch (e) {
+        alert('Error testing API key.');
+        console.error(e);
+    }
+}
+
+async function changePassword() {
+    const current = document.getElementById('currentPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+
+    if (!current || !newPass) {
+        alert('Please fill in both fields.');
+        return;
+    }
+
+    if (newPass.length < 8) {
+        alert('New password must be at least 8 characters.');
+        return;
+    }
+
+    try {
+        const res = await fetch(API_BASE + '/api/admin/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert('✅ Password changed! Please login again.');
+            handleLogout();
+        } else {
+            alert('❌ Failed: ' + data.message);
+        }
+    } catch (e) {
+        alert('Error changing password.');
+        console.error(e);
+    }
+}
+
+// ============================================================
+// ADMIN - DIAGNOSTICS
+// ============================================================
+
+async function runDiagnosticScan() {
+    try {
+        const res = await fetch(API_BASE + '/api/diagnostic/scan', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            displayDiagnostics(data.diagnostics);
+        } else {
+            alert('Diagnostic scan failed.');
+        }
+    } catch (e) {
+        alert('Error running diagnostic.');
+        console.error(e);
+    }
+}
+
+function displayDiagnostics(diag) {
+    const circle = document.getElementById('healthCircle');
+    const status = document.getElementById('healthStatus');
+    const detail = document.getElementById('healthDetail');
+
+    const score = diag.healthScore || 100;
+    circle.textContent = score + '%';
+    circle.className = 'score-circle ' + (score >= 80 ? 'good' : score >= 50 ? 'warning' : 'critical');
+
+    const statusText = diag.status || 'unknown';
+    status.textContent = statusText.charAt(0).toUpperCase() + statusText.slice(1);
+    detail.textContent = diag.issues?.length > 0 ?
+        `${diag.issues.length} issues found. ${diag.fixes?.length || 0} fixes available.` :
+        'All systems operational';
+
+    const issuesEl = document.getElementById('diagnosticIssues');
+    if (diag.issues && diag.issues.length > 0) {
+        issuesEl.innerHTML = diag.issues.map(issue =>
+            `<div class="diagnostic-issue">
+                <div class="issue-title" style="color:${issue.severity === 'critical' ? '#ef5350' : '#ffa726'}">
+                    ${issue.component}: ${issue.issue}
+                </div>
+                <div class="issue-desc">Severity: ${issue.severity}</div>
+                <div class="issue-action">
+                    <button class="btn btn-warning btn-xs" onclick="fixIssue('${issue.component}')">Fix</button>
+                </div>
+            </div>`
+        ).join('');
+    } else {
+        issuesEl.innerHTML = '<div class="text-muted text-sm">✅ No issues detected.</div>';
+    }
+
+    loadHealLogs();
+}
+
+async function fixIssue(component) {
+    try {
+        const res = await fetch(API_BASE + '/api/diagnostic/fix', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ action: component })
+        });
+        const data = await res.json();
+
+        alert(data.success ? '✅ Fix applied: ' + data.message : '❌ Fix failed: ' + data.message);
+        runDiagnosticScan();
+    } catch (e) {
+        alert('Error fixing issue.');
+        console.error(e);
+    }
+}
+
+async function runAutoFix() {
+    try {
+        const res = await fetch(API_BASE + '/api/diagnostic/fix', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ action: 'auto_fix' })
+        });
+        const data = await res.json();
+
+        alert(data.success ? '✅ Auto-fix completed: ' + data.message : '❌ Auto-fix failed: ' + data.message);
+        runDiagnosticScan();
+    } catch (e) {
+        alert('Error running auto-fix.');
+        console.error(e);
+    }
+}
+
+async function loadHealLogs() {
+    try {
+        const res = await fetch(API_BASE + '/api/diagnostic/logs', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success && data.logs) {
+            const tbody = document.getElementById('healLogBody');
+            if (data.logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-muted text-sm">No logs</td></tr>';
+            } else {
+                tbody.innerHTML = data.logs.slice(0, 20).map(log =>
+                    `<tr>
+                        <td style="font-size:0.75rem;color:#78909c;">${new Date(log.timestamp).toLocaleString()}</td>
+                        <td>${log.action}</td>
+                        <td style="color:${log.success ? '#66bb6a' : '#ef5350'};">${log.success ? '✅' : '❌'}</td>
+                        <td style="font-size:0.8rem;color:#78909c;">${log.message}</td>
+                    </tr>`
+                ).join('');
+            }
+        }
+    } catch (e) { console.error('Load heal logs error:', e); }
+}
+
+// ============================================================
+// ADMIN TABS
+// ============================================================
+
+function toggleAdmin() {
+    const panel = document.getElementById('adminPanel');
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        if (isOwner) {
+            loadAdminUsers();
+            loadApiKeyStatus();
+        }
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+function switchAdminTab(tab) {
+    document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tabs .tab').forEach(t => {
+        if (t.textContent.toLowerCase().includes(tab)) t.classList.add('active');
+    });
+
+    document.getElementById('adminUsersTab').style.display = tab === 'users' ? 'block' : 'none';
+    document.getElementById('adminApiTab').style.display = tab === 'api' ? 'block' : 'none';
+    document.getElementById('adminDiagnosticTab').style.display = tab === 'diagnostic' ? 'block' : 'none';
+
+    if (tab === 'users') loadAdminUsers();
+    if (tab === 'api') loadApiKeyStatus();
+    if (tab === 'diagnostic') runDiagnosticScan();
+}
+
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(function(el) {
+            el.classList.remove('active');
+        });
+    }
+    if (e.key === 'Enter' && document.getElementById('loginOverlay').style.display !== 'none') {
+        handleLogin();
+    }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+
+console.log('ALPHA - Frontend loaded successfully!');
+console.log('ℹ️  No credentials are pre-filled for security.');
+</script>
+
+</body>
+</html>
